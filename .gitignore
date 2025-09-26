@@ -1,0 +1,70 @@
+## Build & Visual Studio artifacts
+[Bb]in/
+[Oo]bj/
+*.user
+*.rsuser
+*.suo
+*.userprefs
+*.vcxproj.user
+*.pidb
+*.svclog
+*.pdb
+
+## VS Code
+.vscode/
+.history/
+
+## Rider / JetBrains
+.idea/
+*.DotSettings.user
+
+## .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.cache
+*.ide
+
+## Logs & backups
+*.log
+*.tlog
+*.old
+*.orig
+
+## NuGet
+*.nupkg
+*.snupkg
+# Packages folder can be ignored if using PackageReference (SDK style)
+**/packages/*
+!**/packages/build/
+
+## Generated files
+**/wwwroot/**/lib/
+EventEase/EventEase/wwwroot/lib/
+
+## Publish outputs
+**/publish/
+**/dist/
+
+## Temporary
+*.tmp
+~$*
+*.bak
+
+## OS Specific
+.DS_Store
+Thumbs.db
+
+## Resharper
+*_Resharper.*
+*.DotSettings
+
+## Rider
+.idea/
+
+## Node (if later added for tooling)
+node_modules/
+
+## Secret config (uncomment if you create these)
+# appsettings.*.Local.json
+# secrets.json

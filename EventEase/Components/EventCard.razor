@@ -1,0 +1,25 @@
+@using EventEase.Models
+
+<div class="card event-card mb-3 shadow-sm" style="min-width: 260px;">
+    <div class="card-body">
+        <h5 class="card-title mb-1">@Event?.Name</h5>
+        <small class="text-muted">@Event?.Date.ToString("MMM d, yyyy")</small>
+        <p class="card-text mt-2 mb-1"><span class="bi bi-geo-alt-fill"></span> @Event?.Location</p>
+        @if (!string.IsNullOrWhiteSpace(Event?.Description))
+        {
+            <p class="card-text text-secondary small">@Event!.Description</p>
+        }
+        @if (ShowActions)
+        {
+            <div class="d-flex gap-2 mt-2">
+                <a class="btn btn-sm btn-primary" href="events/@Event?.Id">Details</a>
+                <a class="btn btn-sm btn-outline-success" href="events/@Event?.Id/register">Register</a>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Event? Event { get; set; }
+    [Parameter] public bool ShowActions { get; set; } = true;
+}

@@ -1,0 +1,109 @@
+@page "/events/{id:int}/register"
+@rendermode InteractiveServer
+@using EventEase.Services
+@using EventEase.Models
+@inject IEventService EventService
+
+<PageTitle>Register - EventEase</PageTitle>
+
+<h1>Register</h1>
+
+@if (!_loaded)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EventCard Event="ev" ShowActions="false" />
+    <EditForm Model="registration" OnValidSubmit="HandleSubmit" FormName="eventRegistration" class="mt-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Your Name</label>
+                <InputText class="form-control" @bind-Value="registration.Name" />
+                <ValidationMessage For="() => registration.Name" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <InputText class="form-control" @bind-Value="registration.Email" type="email" />
+                <ValidationMessage For="() => registration.Email" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Attendees</label>
+                <InputNumber class="form-control" @bind-Value="registration.Attendees" />
+                <ValidationMessage For="() => registration.Attendees" />
+            </div>
+            <div class="col-12">
+                <label class="form-label">Notes (optional)</label>
+                <InputTextArea class="form-control" @bind-Value="registration.Notes" rows="3" />
+                <ValidationMessage For="() => registration.Notes" />
+            </div>
+            <div class="col-12 d-flex align-items-center gap-2 mt-2">
+                <button class="btn btn-primary" type="submit" disabled="@(!formIsValid)">Submit</button>
+                <a class="btn btn-secondary" href="/events/@ev!.Id">Cancel</a>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@if (submitted)
+{
+    <div class="alert alert-success mt-3">Registration submitted (demo only).</div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Event? ev;
+    private bool _loaded;
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+
+    private RegistrationModel registration = new();
+    private bool formIsValid => validationMessages.Count == 0;
+    private bool submitted;
+    private ValidationMessageStore? messageStore;
+    private readonly HashSet<string> validationMessages = new();
+
+    [Inject] private UserSessionState Session { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ev = await EventService.GetEventAsync(id);
+        if (ev is null)
+        {
+            Nav.NavigateTo("/404", forceLoad: false);
+            return;
+        }
+        Session.SetLastViewedEvent(ev);
+        _loaded = true;
+    }
+
+    private Task HandleSubmit()
+    {
+        submitted = true;
+        if (ev is not null)
+        {
+            Session.RegisterEvent(ev);
+        }
+        registration = new RegistrationModel();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public class RegistrationModel
+    {
+        [Required(ErrorMessage = "Name is required")] 
+        [StringLength(80, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 80 characters")] 
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "Email is required")] 
+        [EmailAddress(ErrorMessage = "Invalid email address")] 
+        public string? Email { get; set; }
+
+        [Range(1, 50, ErrorMessage = "Attendees must be between 1 and 50")] 
+        public int Attendees { get; set; } = 1;
+
+        [StringLength(500, ErrorMessage = "Notes can't exceed 500 characters")] 
+        public string? Notes { get; set; }
+    }
+}

@@ -1,0 +1,44 @@
+@page "/events/{id:int}"
+@using EventEase.Services
+@using EventEase.Models
+@inject IEventService EventService
+
+<PageTitle>Event Details - EventEase</PageTitle>
+
+<h1>Event Details</h1>
+
+@if (!_loaded)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="mt-3">
+        <EventCard Event="ev" ShowActions="false" />
+        <div class="mt-3">
+            <a class="btn btn-success" href="/events/@ev!.Id/register">Register</a>
+            <a class="btn btn-secondary ms-2" href="/events">Back to list</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Event? ev;
+    private bool _loaded;
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+
+    [Inject] private UserSessionState Session { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ev = await EventService.GetEventAsync(id);
+        if (ev is null)
+        {
+            Nav.NavigateTo("/404", forceLoad: false);
+            return;
+        }
+        Session.SetLastViewedEvent(ev);
+        _loaded = true;
+    }
+}

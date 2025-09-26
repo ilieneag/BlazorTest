@@ -1,0 +1,30 @@
+@using EventEase.Services
+@inject UserSessionState Session
+
+<div class="card mt-4 small border-secondary" style="max-width:320px;">
+    <div class="card-header py-1 bg-light">Session</div>
+    <div class="card-body py-2">
+        <div><strong>Session:</strong> @Session.SessionId.ToString()[..8]</div>
+        <div><strong>Started (UTC):</strong> @Session.CreatedAtUtc.ToString("HH:mm:ss")</div>
+        <div><strong>Viewed:</strong> @(Session.LastViewedEvent?.Name ?? "—")</div>
+        <div><strong>Registrations:</strong> @Session.RegistrationCount</div>
+        @if (Session.LastRegisteredEvent is not null)
+        {
+            <div><strong>Last Registered:</strong> @Session.LastRegisteredEvent.Name</div>
+        }
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Session.OnChange += HandleChanged;
+    }
+
+    private void HandleChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Session.OnChange -= HandleChanged;
+    }
+}
